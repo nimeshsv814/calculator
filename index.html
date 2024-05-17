@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel&family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <title>Calculator</title>
+  </head>
+  <body>
+    <p class="head">Simple Calculator</p>
+    <div class="frame">
+      <h1>CALCULATOR</h1>
+      <input type="text" class="display" readonly />
+      <div class="frame_">
+        <div class="grid-con">
+          <div class="item1"><button class="but">C</button></div>
+          <div class="item2">
+            <button class="but" onclick="appendToDisplay('%')">%</button>
+          </div>
+          <div class="item3">
+            <button class="but" onclick="appendToDisplay('&#8730;')">
+              <i class="material-icons" style="font-size: 20px">&#xe14a;</i>
+            </button>
+          </div>
+          <div class="item4">
+            <button class="but" onclick="appendToDisplay('/')">/</button>
+          </div>
+          <div class="item5">
+            <button class="but" onclick="appendToDisplay('7')">7</button>
+          </div>
+          <div class="item6">
+            <button class="but" onclick="appendToDisplay('8')">8</button>
+          </div>
+          <div class="item7">
+            <button class="but" onclick="appendToDisplay('9')">9</button>
+          </div>
+          <div class="item8">
+            <button class="but" onclick="appendToDisplay('*')">*</button>
+          </div>
+          <div class="item9">
+            <button class="but" onclick="appendToDisplay('4')">4</button>
+          </div>
+          <div class="item10">
+            <button class="but" onclick="appendToDisplay('5')">5</button>
+          </div>
+          <div class="item11">
+            <button class="but" onclick="appendToDisplay('6')">6</button>
+          </div>
+          <div class="item12">
+            <button class="but" onclick="appendToDisplay('-')">-</button>
+          </div>
+          <div class="item13">
+            <button class="but" onclick="appendToDisplay('1')">1</button>
+          </div>
+          <div class="item14">
+            <button class="but" onclick="appendToDisplay('2')">2</button>
+          </div>
+          <div class="item15">
+            <button class="but" onclick="appendToDisplay('3')">3</button>
+          </div>
+          <div class="item16">
+            <button class="but" onclick="appendToDisplay('+')">+</button>
+          </div>
+          <div class="item17">
+            <button class="but" onclick="appendToDisplay('00')">00</button>
+          </div>
+          <div class="item18">
+            <button class="but" onclick="appendToDisplay('0')">0</button>
+          </div>
+          <div class="item19">
+            <button class="but" onclick="appendToDisplay('.')">.</button>
+          </div>
+          <div class="item20">
+            <button class="but" onclick="calculateResult()">=</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const display = document.querySelector(".display");
+      const buttons = document.querySelectorAll(".but");
+
+      let currentInput = "";
+      let currentOperator = "";
+      let prevValue = null;
+
+      function updateDisplay() {
+        display.value = currentInput + currentOperator;
+      }
+
+      function clear() {
+        currentInput = "";
+        currentOperator = "";
+        prevValue = null;
+        updateDisplay();
+      }
+
+      function handleNumberClick(number) {
+        if (currentOperator) {
+          currentInput += currentOperator;
+          currentOperator = "";
+        }
+        currentInput += number;
+        updateDisplay();
+      }
+
+      function handleOperatorClick(operator) {
+        if (currentInput === "") return;
+        if (prevValue !== null) {
+          const result = performCalculation();
+          currentInput = String(result);
+          prevValue = result;
+        } else {
+          prevValue = parseFloat(currentInput);
+        }
+        currentOperator = operator;
+        updateDisplay();
+      }
+
+      function performCalculation() {
+        const inputValue = parseFloat(currentInput);
+        switch (currentOperator) {
+          case "+":
+            return prevValue + inputValue;
+          case "-":
+            return prevValue - inputValue;
+          case "*":
+            return prevValue * inputValue;
+          case "/":
+            return prevValue / inputValue;
+          case "%":
+            return (prevValue * inputValue) / 100;
+          default:
+            return inputValue;
+        }
+      }
+
+      function handleEqualClick() {
+        if (currentOperator && currentInput !== "") {
+          const result = performCalculation();
+          currentInput = String(result);
+          prevValue = result;
+          currentOperator = "";
+          updateDisplay();
+        }
+      }
+
+      function calculateResult() {
+        try {
+          currentInput = currentInput
+            .replace(/Math.sqrt\(/g, "Math.sqrt(")
+            .replace(/\)/g, ")");
+
+          const result = new Function("return " + currentInput)();
+
+          currentInput = result;
+          updateDisplay();
+        } catch (error) {
+          currentInput = "Error";
+          updateDisplay();
+        }
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const buttonText = button.textContent;
+          if (!isNaN(buttonText) || buttonText === ".") {
+            handleNumberClick(buttonText);
+          } else if (buttonText === "C") {
+            clear();
+          } else if (buttonText === "=") {
+            handleEqualClick();
+          } else {
+            handleOperatorClick(buttonText);
+          }
+        });
+      });
+
+      updateDisplay();
+    </script>
+  </body>
+</html>
